@@ -1,0 +1,5 @@
+export const getAllProduct = '/products/getListProduct'
+export const deleteProduct = '/products/deleteProduct'
+export const updateProduct = '/products/updateProduct'
+export const addNewProduct = '/products/addNewProduct'
+export const getDetailProduct = '/products/getDetailProduct'
