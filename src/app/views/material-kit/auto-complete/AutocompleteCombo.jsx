@@ -1,8 +1,11 @@
-import { Fragment, useState } from "react";
 import { Autocomplete, styled, TextField } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
+import { Fragment, useState } from "react";
 
-const AutoComplete = styled(Autocomplete)(() => ({ width: 300, marginBottom: "16px" }));
+const AutoComplete = styled(Autocomplete)(() => ({
+  width: 300,
+  marginBottom: "16px",
+}));
 
 const suggestions = [
   { label: "Afghanistan" },
@@ -38,7 +41,7 @@ const suggestions = [
   { label: "Bouvet Island" },
   { label: "Brazil" },
   { label: "British Indian Ocean Territory" },
-  { label: "Brunei Darussalam" }
+  { label: "Brunei Darussalam" },
 ];
 
 const filter = createFilterOptions();
@@ -57,7 +60,10 @@ export default function AutocompleteCombo() {
   const filterOptions = (options, params) => {
     const filtered = filter(options, params);
     if (params.inputValue !== "") {
-      filtered.push({ inputValue: params.inputValue, label: `Add "${params.inputValue}"` });
+      filtered.push({
+        inputValue: params.inputValue,
+        label: `Add "${params.inputValue}"`,
+      });
     }
     return filtered;
   };
@@ -68,7 +74,12 @@ export default function AutocompleteCombo() {
         options={suggestions}
         getOptionLabel={(option) => option.label}
         renderInput={(params) => (
-          <TextField {...params} label="Combo box" variant="outlined" fullWidth />
+          <TextField
+            {...params}
+            label="Combo box"
+            variant="outlined"
+            fullWidth
+          />
         )}
       />
 
@@ -87,16 +98,28 @@ export default function AutocompleteCombo() {
         style={{ width: 300 }}
         freeSolo
         renderInput={(params) => (
-          <TextField {...params} label="Free solo with text demo" variant="outlined" fullWidth />
+          <TextField
+            {...params}
+            label="Free solo with text demo"
+            variant="outlined"
+            fullWidth
+          />
         )}
       />
 
       <AutoComplete
         options={suggestions}
         getOptionLabel={(option) => option.label}
-        getOptionDisabled={(option) => option === suggestions[0] || option === suggestions[2]}
+        getOptionDisabled={(option) =>
+          option === suggestions[0] || option === suggestions[2]
+        }
         renderInput={(params) => (
-          <TextField {...params} label="Disabled option" variant="outlined" fullWidth />
+          <TextField
+            {...params}
+            label="Disabled option"
+            variant="outlined"
+            fullWidth
+          />
         )}
       />
     </Fragment>

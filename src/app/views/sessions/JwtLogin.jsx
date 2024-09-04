@@ -15,6 +15,7 @@ import * as Yup from "yup";
 
 import { post } from "api/api";
 import { Paragraph } from "app/components/Typography";
+import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { setToast } from "../../../redux/feature";
 
@@ -94,6 +95,8 @@ export default function JwtLogin() {
           })
         );
         localStorage.setItem("token", result.token);
+        Cookies.set("token", result.token, { expires: 1 }); // Token hết hạn sau 1 ngày
+        Cookies.set("user_id", result.user_id, { expires: 1 }); // Token hết hạn sau 1 ngày
         setLoading(false);
         navigate("/");
       } else {

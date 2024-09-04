@@ -6,6 +6,7 @@ import { listToast } from "constants";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import { removeUndefinedProps } from 'utils';
 import { setToast } from "../../redux/feature";
 
 export const FormUpdate = (props) => {
@@ -38,9 +39,8 @@ export const FormUpdate = (props) => {
     async function fetchDataSubmit(info) {
         if (checkId) {
             const response = await post(actions.update, {
-                ...info
+                ...removeUndefinedProps(info)
             }, isFormData)
-            console.log(response);
 
             if (response) setLoading(false)
             if (response.status) {
@@ -54,10 +54,10 @@ export const FormUpdate = (props) => {
                 if (setVisible) setVisible((pre) => !pre)
                 dispatch(setToast({ ...listToast[0], detail: `Update ${title || 'data'} successfully!` }))
             }
-            else dispatch(setToast({ ...listToast[1], detail: response.data.mess }))
+            else dispatch(setToast({ ...listToast[1], detail: response.message }))
         } else {
             const response = await post(actions.add, {
-                ...info
+                ...removeUndefinedProps(info)
             }, isFormData)
             if (response) setLoading(false)
             if (response.status) {
@@ -71,7 +71,7 @@ export const FormUpdate = (props) => {
                 if (setVisible) setVisible((pre) => !pre)
                 dispatch(setToast({ ...listToast[0], detail: `Add ${title || 'data'} successfully!` }))
             }
-            else dispatch(setToast({ ...listToast[1], detail: response.data.mess }))
+            else dispatch(setToast({ ...listToast[1], detail: response.message }))
         }
     }
 

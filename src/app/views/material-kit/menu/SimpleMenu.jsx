@@ -1,4 +1,5 @@
 import { Box, Button, Menu, MenuItem } from "@mui/material";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +31,7 @@ export default function SimpleMenu() {
 
         <MenuItem
           onClick={(e) => {
+            Cookies.remove('token');
             localStorage.removeItem("token");
             navigate("/signin");
           }}

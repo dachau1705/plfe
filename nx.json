@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "start": {
+      "outputs": [
+        "{projectRoot}/y"
+      ],
+      "cache": true
+    },
+    "test": {
+      "outputs": [
+        "{projectRoot}/ "
+      ],
+      "cache": true
+    },
+    "eject": {
+      "outputs": [
+        "{projectRoot}/abc"
+      ],
+      "cache": true
+    },
+    "build": {
+      "cache": true
+    },
+    "ghp": {
+      "cache": true
+    }
+  },
+  "defaultBase": "main",
+  "nxCloudAccessToken": "NTdkOTIwZDktZDJjMy00OTliLTkwMTYtYTI0MzI3MWZkMzU0fHJlYWQtd3JpdGU="
+}

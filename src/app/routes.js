@@ -20,7 +20,8 @@ const AppEchart = Loadable(lazy(() => import("app/views/charts/echarts/AppEchart
 const Analytics = Loadable(lazy(() => import("app/views/dashboard/Analytics")));
 const Product = Loadable(lazy(() => import("app/views/product/Product")));
 const ProductList = Loadable(lazy(() => import("app/views/product/ProductList")));
-
+const CustomerList = Loadable(lazy(() => import("app/views/customers/CustomerList")));
+const ViewUser = Loadable(lazy(() => import("app/views/customers/ViewUser")))
 const routes = [
   {
     element: (
@@ -35,6 +36,8 @@ const routes = [
       { path: "/dashboard/default", element: <Analytics />, auth: authRoles.admin },
       { path: "/product/default", element: <Product />, auth: authRoles.admin },
       { path: "/product/product-list", element: <ProductList />, auth: authRoles.admin },
+      { path: "/customer/customer-list", element: <CustomerList />, auth: authRoles.admin },
+      { path: "/customer/view-customer", element: <ViewUser />, auth: authRoles.admin },
       // e-chart route
       { path: "/charts/echarts", element: <AppEchart />, auth: authRoles.editor }
     ]
@@ -45,7 +48,6 @@ const routes = [
   { path: "/signin", element: <JwtLogin /> },
   { path: "/signup", element: <JwtRegister /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
-
   { path: "/", element: <Navigate to="dashboard/default" /> },
   { path: "*", element: <NotFound /> }
 ];

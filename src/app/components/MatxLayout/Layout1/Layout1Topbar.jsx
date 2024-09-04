@@ -1,4 +1,12 @@
-import { Box, Hidden, IconButton, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Hidden,
+  IconButton,
+  MenuItem,
+  styled,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -23,12 +31,13 @@ import {
   PowerSettingsNew,
   Settings,
   StarOutline,
-  WebAsset
+  WebAsset,
 } from "@mui/icons-material";
+import Cookies from "js-cookie";
 
 // STYLED COMPONENTS
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.primary
+  color: theme.palette.text.primary,
 }));
 
 const TopbarRoot = styled("div")({
@@ -36,7 +45,7 @@ const TopbarRoot = styled("div")({
   zIndex: 96,
   height: topBarHeight,
   boxShadow: themeShadows[8],
-  transition: "all 0.3s ease"
+  transition: "all 0.3s ease",
 });
 
 const TopbarContainer = styled(Box)(({ theme }) => ({
@@ -49,7 +58,7 @@ const TopbarContainer = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   background: theme.palette.primary.main,
   [theme.breakpoints.down("sm")]: { paddingLeft: 16, paddingRight: 16 },
-  [theme.breakpoints.down("xs")]: { paddingLeft: 14, paddingRight: 16 }
+  [theme.breakpoints.down("xs")]: { paddingLeft: 14, paddingRight: 16 },
 }));
 
 const UserMenu = styled(Box)({
@@ -58,7 +67,7 @@ const UserMenu = styled(Box)({
   borderRadius: 24,
   cursor: "pointer",
   alignItems: "center",
-  "& span": { margin: "0 8px" }
+  "& span": { margin: "0 8px" },
 });
 
 const StyledItem = styled(MenuItem)(({ theme }) => ({
@@ -69,14 +78,14 @@ const StyledItem = styled(MenuItem)(({ theme }) => ({
     width: "100%",
     display: "flex",
     alignItems: "center",
-    textDecoration: "none"
+    textDecoration: "none",
   },
-  "& span": { marginRight: "10px", color: theme.palette.text.primary }
+  "& span": { marginRight: "10px", color: theme.palette.text.primary },
 }));
 
 const IconBox = styled("div")(({ theme }) => ({
   display: "inherit",
-  [theme.breakpoints.down("md")]: { display: "none !important" }
+  [theme.breakpoints.down("md")]: { display: "none !important" },
 }));
 
 const Layout1Topbar = () => {
@@ -86,7 +95,9 @@ const Layout1Topbar = () => {
   const isMdScreen = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const updateSidebarMode = (sidebarSettings) => {
-    updateSettings({ layout1Settings: { leftSidebar: { ...sidebarSettings } } });
+    updateSettings({
+      layout1Settings: { leftSidebar: { ...sidebarSettings } },
+    });
   };
 
   const handleSidebarToggle = () => {
@@ -165,6 +176,7 @@ const Layout1Topbar = () => {
               onClick={(e) => {
                 logout();
                 localStorage.removeItem("token");
+                Cookies.remove("token");
                 navigate("/signin");
               }}
             >

@@ -4,3 +4,7 @@ export const listToast = [
     { severity: 'warn', summary: 'Cảnh báo' },
     { severity: 'info', summary: 'Info' },
 ]
+
+export const role = [
+    "admin", "user"
+]

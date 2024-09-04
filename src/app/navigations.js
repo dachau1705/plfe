@@ -7,6 +7,12 @@ export const navigations = [
       { name: "Product List", path: "/product/product-list", iconText: "B" },
     ]
   },
+  {
+    name: "Customers", icon: "people", children: [
+      { name: "Customer List", path: "/customer/customer-list", iconText: "A" },
+      { name: "View Customer", path: "/customer/view-customer", iconText: "B" },
+    ]
+  },
   { label: "Components", type: "label" },
   {
     name: "Components",

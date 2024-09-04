@@ -7,3 +7,12 @@ export const removePropObject = (object1, object2) => {
     }
     return changedProperties
 }
+
+export const removeUndefinedProps = (obj) => {
+    for (let prop in obj) {
+        if (!(obj[prop] || obj[prop] === '' || obj[prop] === 0)) {
+            delete obj[prop]
+        }
+    }
+    return obj
+}
