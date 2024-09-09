@@ -1,0 +1,1 @@
+export const verifyEmail = '/users/verify-email'

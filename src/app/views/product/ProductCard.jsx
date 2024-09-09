@@ -45,7 +45,7 @@ const ProductCard = (props) => {
                 borderRadius: 1,
               }}
             >
-              <img src={item.image} alt={item.name} />
+              <img src={item.image} alt={item.name} style={{width: "100%"}}/>
             </Grid>
             <Grid item xs={4}>
               <Typography gutterBottom>{item.desc}</Typography>

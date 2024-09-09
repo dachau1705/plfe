@@ -14,6 +14,7 @@ const NotFound = Loadable(lazy(() => import("app/views/sessions/NotFound")));
 const JwtLogin = Loadable(lazy(() => import("app/views/sessions/JwtLogin")));
 const JwtRegister = Loadable(lazy(() => import("app/views/sessions/JwtRegister")));
 const ForgotPassword = Loadable(lazy(() => import("app/views/sessions/ForgotPassword")));
+const VerifyEmail = Loadable(lazy(() => import("app/views/sessions/VerifyEmail")));
 // E-CHART PAGE
 const AppEchart = Loadable(lazy(() => import("app/views/charts/echarts/AppEchart")));
 // DASHBOARD PAGE
@@ -48,6 +49,7 @@ const routes = [
   { path: "/signin", element: <JwtLogin /> },
   { path: "/signup", element: <JwtRegister /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/users/verify-email", element: <VerifyEmail /> },
   { path: "/", element: <Navigate to="dashboard/default" /> },
   { path: "*", element: <NotFound /> }
 ];

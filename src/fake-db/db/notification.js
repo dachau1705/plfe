@@ -1,5 +1,5 @@
-import Mock from "../mock";
 import shortId from "shortid";
+import Mock from "../mock";
 
 const NotificationDB = {
   list: [
@@ -45,7 +45,6 @@ Mock.onPost("/api/notification/add").reply(() => {
 
 Mock.onPost("/api/notification/delete").reply((config) => {
   let { id } = JSON.parse(config.data);
-  console.log(config.data);
 
   const response = NotificationDB.list.filter((notification) => notification.id !== id);
   NotificationDB.list = [...response];

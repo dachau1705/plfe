@@ -1,14 +1,12 @@
 import { LoadingButton } from "@mui/lab";
 import {
-  Alert,
   Box,
   Card,
   Checkbox,
   Grid,
-  Snackbar,
   styled,
   TextField,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
 import { useState } from "react";
@@ -17,22 +15,23 @@ import * as Yup from "yup";
 
 import { post } from "api/api";
 import { Paragraph } from "app/components/Typography";
-import useAuth from "app/hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { setToast } from "../../../redux/feature";
 
 // STYLED COMPONENTS
 const FlexBox = styled(Box)(() => ({
   display: "flex",
-  alignItems: "center"
+  alignItems: "center",
 }));
 
 const JustifyBox = styled(FlexBox)(() => ({
-  justifyContent: "center"
+  justifyContent: "center",
 }));
 
 const ContentBox = styled(JustifyBox)(() => ({
   height: "100%",
   padding: "32px",
-  background: "rgba(0, 0, 0, 0.01)"
+  background: "rgba(0, 0, 0, 0.01)",
 }));
 
 const JWTRegister = styled(JustifyBox)(() => ({
@@ -44,8 +43,8 @@ const JWTRegister = styled(JustifyBox)(() => ({
     margin: "1rem",
     display: "flex",
     borderRadius: 12,
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 }));
 
 // initial login credentials
@@ -53,7 +52,7 @@ const initialValues = {
   email: "",
   password: "",
   username: "",
-  remember: true
+  remember: true,
 };
 
 // form field validation schema
@@ -61,27 +60,16 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(6, "Password must be 6 character length")
     .required("Password is required!"),
-  email: Yup.string().email("Invalid Email address").required("Email is required!")
+  email: Yup.string()
+    .email("Invalid Email address")
+    .required("Email is required!"),
 });
 
 export default function JwtRegister() {
   const theme = useTheme();
-  const { register } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [toast, setToast] = useState({
-    severity: null,
-    message: null
-  });
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-  };
+  const dispatch = useDispatch();
 
   const handleFormSubmit = async (values) => {
     setLoading(true);
@@ -90,22 +78,28 @@ export default function JwtRegister() {
       const result = await post("/users/register", {
         username: values.username,
         email: values.email,
-        password: values.password
+        password: values.password,
       });
       if (result.status) {
-        setOpen(true);
-        setToast({
-          severity: "success",
-          message: result.message
-        });
+        dispatch(
+          setToast({
+            severity: "success",
+            summary: "Thành công!",
+            detail: result.message,
+            life: 3000,
+          })
+        );
         setLoading(false);
         navigate("/signin");
       } else {
-        setOpen(true);
-        setToast({
-          severity: "error",
-          message: result.message
-        });
+        dispatch(
+          setToast({
+            severity: "error",
+            summary: "Thành công!",
+            detail: result.message,
+            life: 3000,
+          })
+        );
         setLoading(false);
       }
     } catch (e) {
@@ -115,16 +109,6 @@ export default function JwtRegister() {
 
   return (
     <JWTRegister>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity={toast.severity} sx={{ width: "100%" }}>
-          {toast.message}
-        </Alert>
-      </Snackbar>
       <Card className="card">
         <Grid container>
           <Grid item sm={6} xs={12}>
@@ -144,7 +128,14 @@ export default function JwtRegister() {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
               >
-                {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                {({
+                  values,
+                  errors,
+                  touched,
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                }) => (
                   <form onSubmit={handleSubmit}>
                     <TextField
                       fullWidth
@@ -218,7 +209,10 @@ export default function JwtRegister() {
                       Already have an account?
                       <NavLink
                         to="/session/signin"
-                        style={{ color: theme.palette.primary.main, marginLeft: 5 }}
+                        style={{
+                          color: theme.palette.primary.main,
+                          marginLeft: 5,
+                        }}
                       >
                         Login
                       </NavLink>

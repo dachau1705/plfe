@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import CssBaseline from "@mui/material/CssBaseline";
 import { useRoutes } from "react-router-dom";
 
@@ -23,6 +24,8 @@ export default function App() {
   const handleClose = () => {
     setVisible(false);
   };
+  // const user = useSelector((state) => state.userInfo);
+  // console.log(user);
   useEffect(() => {
     if (toastOptions.severity) {
       setVisible(true);

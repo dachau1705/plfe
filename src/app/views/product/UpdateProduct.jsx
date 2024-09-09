@@ -21,7 +21,6 @@ export default function UpdateProduct({ open, setOpen, _id, setParams }) {
       }
     }
   }, [detail]);
-  console.log(infos);
 
   const handleClose = () => setOpen(false);
   const handleData = () => {

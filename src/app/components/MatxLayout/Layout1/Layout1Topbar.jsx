@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Hidden,
   IconButton,
@@ -33,7 +34,9 @@ import {
   StarOutline,
   WebAsset,
 } from "@mui/icons-material";
+import { useUserDetail } from "app/api";
 import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 // STYLED COMPONENTS
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -91,7 +94,15 @@ const IconBox = styled("div")(({ theme }) => ({
 const Layout1Topbar = () => {
   const theme = useTheme();
   const { settings, updateSettings } = useSettings();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
+  const _id = Cookies.get("user_id");
+  const detail = useUserDetail(_id);
+  const [userInfor, setUserInfor] = useState({});
+  useEffect(() => {
+    if (detail.userInfo) {
+      setUserInfor(detail.userInfo);
+    }
+  }, [detail]);
   const isMdScreen = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const updateSidebarMode = (sidebarSettings) => {
@@ -147,9 +158,11 @@ const Layout1Topbar = () => {
             menuButton={
               <UserMenu>
                 <Hidden xsDown>
-                  <Span>{/* Hi <strong>{user.name}</strong> */}</Span>
+                  <Span>
+                    Hi <strong>{userInfor.lastName}</strong>
+                  </Span>
                 </Hidden>
-                {/* <Avatar src={user.avatar} sx={{ cursor: "pointer" }} /> */}
+                <Avatar src={userInfor.avatar} sx={{ cursor: "pointer" }} />
               </UserMenu>
             }
           >
@@ -161,7 +174,7 @@ const Layout1Topbar = () => {
             </StyledItem>
 
             <StyledItem>
-              <Link to="/page-layouts/user-profile">
+              <Link to="/customer/view-customer">
                 <Person />
                 <Span>Profile</Span>
               </Link>

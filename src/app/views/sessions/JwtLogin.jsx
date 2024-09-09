@@ -9,13 +9,12 @@ import {
   useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink } from "react-router-dom";
 import * as Yup from "yup";
 
-import { post } from "api/api";
 import { Paragraph } from "app/components/Typography";
-import Cookies from "js-cookie";
+import AuthContext from "app/contexts/JWTAuthContext";
 import { useDispatch } from "react-redux";
 import { setToast } from "../../../redux/feature";
 
@@ -76,42 +75,25 @@ const validationSchema = Yup.object().shape({
 export default function JwtLogin() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { login } = useContext(AuthContext); // Use login from AuthContext
   const [loading, setLoading] = useState(false);
+
   const handleFormSubmit = async (values) => {
     setLoading(true);
     try {
-      const result = await post("/users/login", {
-        username: values.email,
-        password: values.password,
-      });
-      if (result.status) {
-        dispatch(
-          setToast({
-            severity: "success",
-            summary: "Thành công!",
-            detail: result.message,
-            life: 3000,
-          })
-        );
-        localStorage.setItem("token", result.token);
-        Cookies.set("token", result.token, { expires: 1 }); // Token hết hạn sau 1 ngày
-        Cookies.set("user_id", result.user_id, { expires: 1 }); // Token hết hạn sau 1 ngày
-        setLoading(false);
-        navigate("/");
-      } else {
-        dispatch(
-          setToast({
-            severity: "error",
-            summary: "Thành công!",
-            detail: result.message,
-            life: 3000,
-          })
-        );
-        setLoading(false);
-      }
-    } catch (e) {
-      console.log(e);
+      // Thực hiện đăng nhập bằng hàm login từ AuthContext
+      await login(values.email, values.password, setLoading);
+      // Chuyển hướng sau khi đăng nhập thành công
+    } catch (error) {
+      dispatch(
+        setToast({
+          severity: "error",
+          summary: "Thất bại!",
+          detail: error.response?.data?.message || "Login Failed!",
+          life: 3000,
+        })
+      );
+      setLoading(false);
     }
   };
 

@@ -5,7 +5,7 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import UserDetail from "./UserDetail";
 
 const CustomTabPanel = (props) => {
@@ -39,6 +39,7 @@ const a11yProps = (index) => {
 
 const ViewUser = () => {
   const [value, setValue] = useState(0);
+  const { id } = useParams();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { get, post } from "api/api"
 import { useEffect, useState } from "react"
 import { getAllProvinces, getDistrictsByProvince, getWardsByDistrict } from "../address"
@@ -30,7 +31,6 @@ export const useListProduct = (params) => {
     useEffect(() => {
         fetchData()
     }, [JSON.stringify(params)])
-    console.log(data);
 
     return data
 }
@@ -47,7 +47,6 @@ export const useListUsers = (params) => {
     useEffect(() => {
         fetchData()
     }, [JSON.stringify(params)])
-    console.log(data);
 
     return data
 }
@@ -78,7 +77,6 @@ export const useListProvinces = (params) => {
     useEffect(() => {
         fetchData()
     }, [JSON.stringify(params)])
-    console.log(data);
 
     return data
 }

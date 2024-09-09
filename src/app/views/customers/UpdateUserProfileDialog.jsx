@@ -5,13 +5,12 @@ import TextField from "@mui/material/TextField";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import {
-  addNewProduct,
-  updateProduct,
   useListDistrics,
   useListProvinces,
   useListWards,
-  useUserDetail,
+  useUserDetail
 } from "app/api";
+import { createUser, updateUser } from "app/api/users";
 import { FormUpdate } from "core/form/FormUpdate";
 import { ItemGrid } from "core/form/ItemGrid";
 import ImageUploadComponent from "core/form/UploadFile";
@@ -22,21 +21,60 @@ import { role } from "../../../constants";
 export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
   const [infos, setInfos] = useState({});
   const detail = useUserDetail(_id);
+  const [userDeatail, setUserDetail] = useState({});
   const [file, setFile] = useState(null);
   const provinces = useListProvinces();
   const districs = useListDistrics(infos.city);
   const wards = useListWards(infos.state);
 
   useEffect(() => {
-    if (detail._id) {
-      setInfos({ ...detail });
-      if (detail.image) {
-        setFile(detail.image);
+    if (detail) {
+      const user = detail?.user || {};
+      const userInfo = detail?.userInfo || {};
+      const address = userInfo?.address || {};
+      setInfos({
+        _id: user?._id,
+        email: user?.email,
+        role: user?.role,
+        firstName: userInfo?.firstName,
+        lastName: userInfo?.lastName,
+        phoneNumber: userInfo?.phoneNumber,
+        street: address?.street === "Đường" ? null : address?.street,
+        city: address?.city === "Tỉnh/Thành Phố" ? null : address?.city,
+        state:
+          address?.state === "Phường/Huyện/Thị Trấn" ? null : address?.state,
+        country: address?.country === "Việt Nam" ? null : address?.country,
+        postalCode: address?.postalCode,
+        desc: userInfo?.desc,
+        dob: userInfo?.dob,
+      });
+      setUserDetail({
+        _id: user?._id,
+        email: user?.email,
+        role: user?.role,
+        firstName: userInfo?.firstName,
+        lastName: userInfo?.lastName,
+        phoneNumber: userInfo?.phoneNumber,
+        street: address?.street === "Đường" ? null : address?.street,
+        city: address?.city === "Tỉnh/Thành Phố" ? null : address?.city,
+        state:
+          address?.state === "Phường/Huyện/Thị Trấn" ? null : address?.state,
+        country: address?.country === "Việt Nam" ? null : address?.country,
+        postalCode: address?.postalCode,
+        desc: userInfo?.desc,
+        dob: userInfo?.dob,
+      });
+      if (userInfo?.avatar) {
+        setFile(userInfo?.avatar);
       }
     }
   }, [detail]);
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setInfos(null);
+    setFile(null);
+  };
   const handleData = () => {
     let info = {
       ...infos,
@@ -44,7 +82,7 @@ export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
     if (file) {
       info.image = file;
     }
-    info = { ...removePropObject(info, detail), _id: _id };
+    info = { ...removePropObject(info, userDeatail), _id: _id };
     return info;
   };
 
@@ -61,12 +99,12 @@ export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
             <FormUpdate
               isFormData={true}
               checkId={_id}
-              title={"product"}
+              title={"user"}
               setParams={setParams}
               refreshObjects={[setInfos]}
               handleData={handleData}
-              actions={{ add: addNewProduct, update: updateProduct }}
-              route="/product/product-list"
+              actions={{ add: createUser, update: updateUser }}
+              route="/customer/customer-list"
               setVisible={setOpen}
             >
               <Box
@@ -103,19 +141,6 @@ export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
                       <ItemGrid>
                         <TextField
                           fullWidth
-                          id="email"
-                          type="text"
-                          margin="dense"
-                          label="Email"
-                          value={infos.email}
-                          onChange={(e) =>
-                            setInfos({ ...infos, email: e.target.value })
-                          }
-                        />
-                      </ItemGrid>
-                      <ItemGrid>
-                        <TextField
-                          fullWidth
                           id="firstName"
                           type="text"
                           margin="dense"
@@ -136,6 +161,19 @@ export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
                           value={infos.lastName}
                           onChange={(e) =>
                             setInfos({ ...infos, lastName: e.target.value })
+                          }
+                        />
+                      </ItemGrid>
+                      <ItemGrid>
+                        <TextField
+                          fullWidth
+                          id="email"
+                          type="text"
+                          margin="dense"
+                          label="Email"
+                          value={infos.email}
+                          onChange={(e) =>
+                            setInfos({ ...infos, email: e.target.value })
                           }
                         />
                       </ItemGrid>
