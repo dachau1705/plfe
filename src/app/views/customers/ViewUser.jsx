@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import Invoices from "../orders/Invoices";
 import UserDetail from "./UserDetail";
 
 const CustomTabPanel = (props) => {
@@ -74,7 +75,7 @@ const ViewUser = () => {
           <UserDetail />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          Item Two
+          <Invoices />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           Item Three

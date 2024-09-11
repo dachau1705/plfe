@@ -8,9 +8,11 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import { format } from "date-fns";
 import { useState } from "react";
 
 export default function PaginationTable({
+  header,
   columns,
   data,
   renderAction,
@@ -38,22 +40,32 @@ export default function PaginationTable({
         color: (theme) =>
           theme.palette.mode === "dark" ? "grey.300" : "grey.800",
         p: 2,
-        // m: 1,
         borderRadius: 2,
         textAlign: "center",
         fontSize: "0.875rem",
         fontWeight: "700",
       }}
     >
+      <Box sx={{ textAlign: "left", fontSize: "h5.fontSize" }}>
+        <Box>{header}</Box>
+      </Box>
       <Table sx={{ width: 1 }}>
         <TableHead>
           <TableRow>
             {columns.map((column, index) => (
-              <TableCell key={index} align={column.align || "left"}>
+              <TableCell
+                key={index}
+                align={column.align || "left"}
+                sx={column.sx || null}
+              >
                 {column.label}
               </TableCell>
             ))}
-            {renderAction && <TableCell align="right">Action</TableCell>}
+            {renderAction && (
+              <TableCell sx={{ width: 1 / 10 }} align="center">
+                Action
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
 
@@ -64,7 +76,7 @@ export default function PaginationTable({
               <TableRow key={rowIndex}>
                 {columns.map((column, colIndex) => (
                   <TableCell key={colIndex} align={column.align || "center"}>
-                    {column.field === "image" ? (
+                    {column.type === "image" ? (
                       <Box
                         sx={{
                           display: "flex",
@@ -83,6 +95,15 @@ export default function PaginationTable({
                           variant="square"
                         />
                       </Box>
+                    ) : column.type === "datetime" ? (
+                      <>
+                        {format(
+                          new Date(row[column.field]),
+                          "dd MMM, yyyy | hh:mm a"
+                        )}
+                      </>
+                    ) : column.body ? (
+                      column.body(row) // Kiểm tra xem cột có trường body và render nội dung tùy chỉnh
                     ) : (
                       row[column.field]
                     )}

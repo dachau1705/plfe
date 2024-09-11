@@ -45,7 +45,7 @@ const ProductCard = (props) => {
                 borderRadius: 1,
               }}
             >
-              <img src={item.image} alt={item.name} style={{width: "100%"}}/>
+              <img src={item.image} alt={item.name} style={{ width: "100%" }} />
             </Grid>
             <Grid item xs={4}>
               <Typography gutterBottom>{item.desc}</Typography>
@@ -87,6 +87,8 @@ const ProductCard = (props) => {
               {String(item.desc)?.substring(0, 60)}...
             </Typography>
           </CardContent>
+          <CardContent>{item.priceSale}</CardContent>
+          <CardContent>{item.price}</CardContent>
         </CardActionArea>
         <CardActions>
           <Button

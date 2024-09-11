@@ -1,4 +1,4 @@
-import { Icon, IconButton } from "@mui/material";
+import { Box, Icon, IconButton } from "@mui/material";
 import { deleteProduct, useListProduct } from "app/api";
 import { SimpleCard } from "app/components";
 import DeleteDialog from "core/form/DeleteDialog";
@@ -27,7 +27,7 @@ const ProductList = () => {
   };
   const columns2 = [
     { label: "Name", field: "name", align: "left" },
-    { label: "Image", field: "image", align: "center" },
+    { label: "Image", field: "image", align: "center", type: "image" },
     { label: "Price", field: "price", align: "center" },
     { label: "Purchase Price", field: "priceIn", align: "center" },
     { label: "Price Sale", field: "priceSale", align: "center" },
@@ -56,14 +56,14 @@ const ProductList = () => {
         columns={columns2}
         data={data}
         renderAction={(row) => (
-          <>
+          <Box sx={{ textAlign: "center" }}>
             <IconButton onClick={() => handleDelete(row._id)}>
               <Icon color="error">delete</Icon>
             </IconButton>
             <IconButton onClick={() => handleEdit(row._id)}>
               <Icon color="info">info_outline</Icon>
             </IconButton>
-          </>
+          </Box>
         )}
         rowsPerPageOptions={[10, 20, 50, 100, 1000]}
         initialRowsPerPage={10}

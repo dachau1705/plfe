@@ -1,4 +1,4 @@
-import { Icon, IconButton } from "@mui/material";
+import { Box, Icon, IconButton } from "@mui/material";
 import { deleteProduct, useListUsers } from "app/api";
 import { SimpleCard } from "app/components";
 import DeleteDialog from "core/form/DeleteDialog";
@@ -30,7 +30,7 @@ const CustomerList = () => {
     { label: "Id", field: "_id", align: "left" },
     { label: "Email", field: "email", align: "left" },
     { label: "Username", field: "username", align: "left" },
-    { label: "Role", field: "role", align: "center" },
+    { label: "Role", field: "role", align: "left", sx: { width: 1 / 10 } },
     // { label: "Price Sale", field: "priceSale", align: "center" },
     // { label: "Amount", field: "amount", align: "center" },
   ];
@@ -57,14 +57,14 @@ const CustomerList = () => {
         columns={columns2}
         data={data}
         renderAction={(row) => (
-          <>
+          <Box sx={{ textAlign: "center" }}>
             <IconButton onClick={() => handleDelete(row._id)}>
               <Icon color="error">delete</Icon>
             </IconButton>
             <IconButton onClick={() => handleEdit(row._id)}>
               <Icon color="info">info_outline</Icon>
             </IconButton>
-          </>
+          </Box>
         )}
         rowsPerPageOptions={[10, 20, 50, 100, 1000]}
         initialRowsPerPage={10}
