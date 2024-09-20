@@ -13,6 +13,17 @@ export const navigations = [
       { name: "View Customer", path: "/customer/view-customer", iconText: "B" },
     ]
   },
+  {
+    name: "Orders", icon: "local_grocery_store", children: [
+      { name: "Order List", path: "/orders/order-list", iconText: "A" },
+      { name: "View Customer", path: "/customer/view-customer", iconText: "B" },
+    ]
+  },
+  {
+    name: "Ecommerce", icon: "shopping_basket", children: [
+      { name: "Checkout", path: "/ecommerce/checkout", iconText: "A" },
+    ]
+  },
   { label: "Components", type: "label" },
   {
     name: "Components",

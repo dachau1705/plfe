@@ -26,6 +26,7 @@ export const FormUpdate = (props) => {
         buttonLabel,
         handleSubmit,
         isFormData,
+        buttonVisible,
         ...prop
     } = props
     const navigate = useNavigate()
@@ -108,35 +109,41 @@ export const FormUpdate = (props) => {
                 {props.children}
             </Box>
             <Box display="flex" justifyContent="end" gap={3}>
-                {(route || setVisible) && (
-                    <Button
-                        variant="contained"
-                        size="small"
-                        color="error"
-                        startIcon={setVisible ? <CloseIcon /> : null}
-                        onClick={() => {
-                            if (route && !setVisible) {
-                                if (query && !setVisible) navigate(route + query);
-                                else navigate(-1);
-                            } else {
-                                setVisible(false);
-                            }
-                        }}
-                    >
-                        {setVisible ? 'Close' : 'Return'}
-                    </Button>
-                )}
-                {actions && (
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        size="small"
-                        color="info"
-                        startIcon={<SaveIcon />}
-                    >
-                        {buttonLabel ? buttonLabel : setVisible ? 'CONFIRM' : checkId ? 'UPDATE' : 'ADD'}
-                    </Button>
-                )}
+                {
+                    buttonVisible ? null : (
+                        <>
+                            {(route || setVisible) && (
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="error"
+                                    startIcon={setVisible ? <CloseIcon /> : null}
+                                    onClick={() => {
+                                        if (route && !setVisible) {
+                                            if (query && !setVisible) navigate(route + query);
+                                            else navigate(-1);
+                                        } else {
+                                            setVisible(false);
+                                        }
+                                    }}
+                                >
+                                    {setVisible ? 'Close' : 'Return'}
+                                </Button>
+                            )}
+                            {actions && (
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    size="small"
+                                    color="info"
+                                    startIcon={<SaveIcon />}
+                                >
+                                    {buttonLabel ? buttonLabel : setVisible ? 'CONFIRM' : checkId ? 'UPDATE' : 'ADD'}
+                                </Button>
+                            )}
+                        </>
+                    )
+                }
             </Box>
         </form>
         // </div>

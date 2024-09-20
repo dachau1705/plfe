@@ -1,171 +1,87 @@
-import styled from "@emotion/styled";
-import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Breadcrumbs,
-  Container,
+  Button,
+  Card,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
   Grid,
+  Icon,
+  IconButton,
   InputAdornment,
+  MenuItem,
   Pagination,
+  Radio,
+  RadioGroup,
+  Rating,
+  Select,
   Slider,
   TextField,
   Typography,
 } from "@mui/material";
-import { get } from "api/api";
-import { getAllProduct } from "app/api";
+import { get, post } from "api/api";
+import { addToCartApi, getAllProduct } from "app/api";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { listToast, usdFormatter } from "../../../constants";
+import { addToCart, setToast } from "../../../redux/feature";
 import ProductCard from "./ProductCard";
-
-// const data = [
-//   {
-//     id: 1,
-//     price: 100,
-//     name: "Product 1",
-//     src: "https://i.pinimg.com/564x/c2/35/b0/c235b08f99954713a5984ecc52ea82b1.jpg",
-//     desc: "Vandalism Alley Animated Stream Overlay Package with futuristic and modern design. Vandalism Alley enhances your live broadcast with a visually stunning overlay. It features vibrant colors, abstract graffiti elements, and sleek geometric patterns that create a mesmerizing backdrop for your content.",
-//   },
-//   {
-//     id: 2,
-//     price: 100,
-//     name: "Product 2",
-//     src: "https://i.pinimg.com/564x/df/7f/56/df7f568e2efe266c8279242d53eef7d8.jpg",
-//     desc: "Shop Cute Stream Design by SugarStreamfly. Speedy replies! Has a history of replying to messages quickly. Rave reviews! Average review rating is 4.8 or higher.",
-//   },
-//   {
-//     id: 3,
-//     price: 100,
-//     name: "Product 3",
-//     src: "https://i.pinimg.com/564x/7d/1c/29/7d1c2946c66d02b6e04f8aae0a6082e2.jpg",
-//     desc: "Description for Product 3",
-//   },
-//   {
-//     id: 4,
-//     name: "Ekko",
-//     src: "https://i.pinimg.com/564x/82/04/6d/82046d2736e5ed33cf312995ffb1cc9c.jpg",
-//     desc: "Description for Product 4",
-//   },
-//   {
-//     id: 5,
-//     name: "Ekko",
-//     src: "https://i.pinimg.com/564x/70/1f/30/701f30a176780ec9db925ba985380cf4.jpg",
-//     desc: "Description for Product 5",
-//   },
-//   {
-//     id: 6,
-//     name: "Yuzhong",
-//     src: "https://i.pinimg.com/564x/4f/e7/cd/4fe7cdb16bfc65884f2daa35c737c358.jpg",
-//     desc: "Description for Product 6",
-//   },
-//   {
-//     id: 7,
-//     name: "Yishushin",
-//     src: "https://i.pinimg.com/564x/96/52/93/965293b563f8e617ae9eb70d7043e90f.jpg",
-//     desc: "Description for Product 7",
-//   },
-//   {
-//     id: 8,
-//     price: 100,
-//     name: "Product 8",
-//     src: "https://i.pinimg.com/564x/e3/b2/b8/e3b2b8992f488b17d779cd5a0982b5ae.jpg",
-//     desc: "Description for Product 8",
-//   },
-//   {
-//     id: 9,
-//     price: 100,
-//     name: "Product 9",
-//     src: "https://i.pinimg.com/564x/74/5b/7f/745b7f0642f806d9dc422b583e450be2.jpg",
-//     desc: "Description for Product 9",
-//   },
-//   {
-//     id: 10,
-//     price: 100,
-//     name: "Product 10",
-//     src: "https://i.pinimg.com/564x/8a/fa/ac/8afaac4a8470e5fb2006e688d57baecc.jpg",
-//     desc: "Description for Product 10",
-//   },
-//   {
-//     id: 11,
-//     price: 100,
-//     name: "Product 11",
-//     src: "https://i.pinimg.com/564x/5b/fc/55/5bfc55b2bc6ddfe40506d0f0b2bf012a.jpg",
-//     desc: "Description for Product 11",
-//   },
-//   {
-//     id: 12,
-//     price: 100,
-//     name: "Product 12",
-//     src: "https://i.pinimg.com/564x/df/8a/76/df8a762b99ed79ac1366d9d82bd43192.jpg",
-//     desc: "Description for Product 12",
-//   },
-//   {
-//     id: 13,
-//     price: 100,
-//     name: "Product 13",
-//     src: "https://i.pinimg.com/564x/f8/6b/2f/f86b2f0eda7ec6f75f8c67abde927c31.jpg",
-//     desc: "Description for Product 13",
-//   },
-//   {
-//     id: 14,
-//     price: 100,
-//     name: "Product 14",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 14",
-//   },
-//   {
-//     id: 15,
-//     price: 100,
-//     name: "Product 15",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 15",
-//   },
-//   {
-//     id: 16,
-//     price: 100,
-//     name: "Product 16",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 16",
-//   },
-//   {
-//     id: 17,
-//     price: 100,
-//     name: "Product 17",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 17",
-//   },
-//   {
-//     id: 18,
-//     price: 100,
-//     name: "Product 18",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 18",
-//   },
-//   {
-//     id: 19,
-//     price: 100,
-//     name: "Product 19",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 19",
-//   },
-//   {
-//     id: 20,
-//     price: 100,
-//     name: "Product 20",
-//     src: "https://via.placeholder.com/150",
-//     desc: "Description for Product 20",
-//   },
-// ];
-const Item = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  border: "1px solid",
-  borderColor: theme.palette.mode === "dark" ? "#444d58" : "#ced7e0",
-  padding: theme.spacing(1),
-  borderRadius: "4px",
-}));
 
 const Product = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedValue, setSelectedValue] = useState("default");
+  const [radioValue, setRadioValue] = useState("default");
+  const [viewType, setViewType] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
+  const userId = Cookies.get("user_id");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const pageCount = Math.ceil(data.length / itemsPerPage);
+  const currentData = data.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const categories = [
+    { name: "Audio", count: 321 },
+    { name: "Fashion", count: 123 },
+    { name: "Cellphone", count: 546 },
+    { name: "Accessories", count: 76 },
+  ];
+
+  const brands = [
+    { name: "Microlab", count: 32 },
+    { name: "Sony", count: 534 },
+    { name: "Beats", count: 23 },
+    { name: "Iphone", count: 65 },
+    { name: "Comlion", count: 198 },
+  ];
+
+  const handleChange = (event) => {
+    const value = event.target.value;
+    setSelectedValue(value);
+    if (value === "lowest") {
+      setData(data.sort((a, b) => b.priceSale - a.priceSale));
+    } else if (value === "highest") {
+      setData(data.sort((a, b) => a.priceSale - b.priceSale));
+    }
+  };
+
+  const handleRadioChange = (event) => {
+    setRadioValue(event.target.value);
+    console.log(event.target.value);
+  };
+
+  const [sliderValue, setSliderValue] = useState([0, 1000000]);
+
+  const handleSliderChange = (event, newValue) => {
+    setSliderValue(newValue);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -174,26 +90,72 @@ const Product = () => {
         setData(result);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu:", error);
-      } finally {
-        setLoading(false);
       }
     }
-
     fetchData();
   }, []);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
-  const pageCount = Math.ceil(data.length / itemsPerPage);
-  const currentData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+
+  useEffect(() => {
+    if (viewType === 1) {
+      setItemsPerPage(12);
+      setCurrentPage(1);
+    } else {
+      setItemsPerPage(4);
+      setCurrentPage(1);
+    }
+  }, [viewType]);
+
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
-  const [filter, setFilter] = useState({});
+
+  const handleAddToCart = async (item, e) => {
+    e.preventDefault();
+    try {
+      const result = await post(addToCartApi, { ...item, userId });
+      if (result.status === true) {
+        dispatch(
+          addToCart({
+            items: [
+              {
+                name: item.name,
+                productId: item._id,
+                quantity: 1,
+                price: item.priceSale ? item.priceSale : item.price,
+                total_price: item.priceSale ? item.priceSale : item.price,
+                image: item.image,
+              },
+            ],
+          })
+        );
+        console.log(1);
+
+        dispatch(
+          setToast({
+            ...listToast[0],
+            detail: result.message,
+          })
+        );
+      } else {
+        dispatch(
+          setToast({
+            ...listToast[1],
+            detail: result.message,
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        setToast({
+          ...listToast[1],
+          detail: error,
+        })
+      );
+    }
+  };
+
   return (
-    <div sx={{ mx: 10 }}>
+    <Box sx={{ mx: 10 }}>
       <Box sx={{ my: 2, mx: 4 }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ lineHeight: 4 }}>
           <Link underline="hover" to={"/"}>
@@ -205,30 +167,345 @@ const Product = () => {
           <Typography color="text.primary">ALL</Typography>
         </Breadcrumbs>
       </Box>
-      <Box sx={{ width: 1, bgcolor: "#E2E2E2", borderRadius: "12px", ml: 2 }}>
-        <Grid container spacing={2} sx={{ p: 1 }}>
-          <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 0.5 }}>
-            <Box>
-              <Box
-                sx={{ display: "flex", justifyContent: "center", p: 1, m: 1 }}
+      <Box sx={{ width: 1, ml: 2 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(6, 1fr)",
+            gap: 1,
+            gridTemplateRows: "auto",
+            gridTemplateAreas: `"sidebar main main main main main"
+            "left right right right right right"`,
+          }}
+        >
+          <Box sx={{ gridArea: "sidebar" }}>
+            <TextField
+              sx={{ bgcolor: "white" }}
+              fullWidth
+              id="search-input"
+              name="query"
+              placeholder="Search here..."
+              variant="outlined"
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Icon fontSize="small">search</Icon>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              gridArea: "main",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <FormControl variant="standard">
+              <Select
+                sx={{ my: "auto" }}
+                value={selectedValue}
+                onChange={handleChange}
+                displayEmpty
+                inputProps={{ "aria-label": "Without label" }}
+                // IconComponent={ArrowDropDownIcon}
               >
+                <MenuItem value="default">Default</MenuItem>
+                <MenuItem value="lowest">Lowest Price</MenuItem>
+                <MenuItem value="highest">Highest Price</MenuItem>
+                {/* Add more MenuItem components as needed */}
+              </Select>
+            </FormControl>
+            <IconButton
+              className="button"
+              aria-label="View Comfy"
+              onClick={() => setViewType(1)}
+            >
+              <Icon sx={{ my: "auto" }}>view_comfy</Icon>
+            </IconButton>
+            <IconButton
+              className="button"
+              aria-label="View List"
+              onClick={() => setViewType(2)}
+            >
+              <Icon>list</Icon>
+            </IconButton>
+          </Box>
+          <Box sx={{ gridArea: "left" }}>
+            <Card elevation={5}>
+              <Typography
+                variant="h7"
+                sx={{ p: 2, display: "block", fontWeight: 500 }}
+              >
+                Price
+              </Typography>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  aria-label="price"
+                  name="price"
+                  value={radioValue}
+                  onChange={handleRadioChange}
+                >
+                  <FormGroup>
+                    <FormControlLabel
+                      sx={{ ml: 2, lineHeight: 0.8 }}
+                      value="0,10"
+                      control={<Radio />}
+                      label="<$10"
+                    />
+                    <FormControlLabel
+                      sx={{ ml: 2, lineHeight: 0.8 }}
+                      value="10,100"
+                      control={<Radio />}
+                      label="$10-$100"
+                    />
+                    <FormControlLabel
+                      sx={{ ml: 2, lineHeight: 0.8 }}
+                      value="100,500"
+                      control={<Radio />}
+                      label="$100-$500"
+                    />
+                    <FormControlLabel
+                      sx={{ ml: 2, lineHeight: 0.8 }}
+                      value="500"
+                      control={<Radio />}
+                      label=">$500"
+                    />
+                    <FormControlLabel
+                      sx={{ ml: 2, lineHeight: 0.8 }}
+                      value="all"
+                      control={<Radio />}
+                      label="All"
+                    />
+                  </FormGroup>
+                </RadioGroup>
+              </FormControl>
+            </Card>
+            <Card elevation={5} sx={{ my: 2 }}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography
+                  variant="h7"
+                  sx={{ p: 2, display: "block", fontWeight: 500 }}
+                >
+                  Price
+                </Typography>
+                <Typography sx={{ mr: 1 }}>
+                  {usdFormatter.format(sliderValue[0])} -{" "}
+                  {usdFormatter.format(sliderValue[1])}
+                </Typography>
+              </Box>
+              <Box sx={{ px: 2 }}>
+                <Slider
+                  value={sliderValue}
+                  onChange={handleSliderChange}
+                  valueLabelDisplay="auto"
+                  min={0}
+                  max={1000000}
+                />
+              </Box>
+            </Card>
+            <Card elevation={5} sx={{ my: 2 }}>
+              <Typography
+                variant="h7"
+                sx={{ p: 2, display: "block", fontWeight: 500 }}
+              >
+                Category
+              </Typography>
+              {categories.map((category) => (
+                <Box
+                  key={category.name}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mx: 2 }}
+                >
+                  <FormControlLabel
+                    control={<Checkbox name={category.name} />}
+                    label={<Typography>{category.name}</Typography>}
+                  />
+                  <small className="badge">{category.count}</small>
+                </Box>
+              ))}
+            </Card>
+            <Card elevation={5} sx={{ my: 2 }}>
+              <Typography
+                variant="h7"
+                sx={{ p: 2, display: "block", fontWeight: 500 }}
+              >
+                Brands
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
                 <TextField
-                  id="input-with-icon-textfield"
-                  label="Search ..."
+                  fullWidth
+                  size="small"
+                  placeholder="Search here..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <SearchIcon />
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon>search</Icon>
                       </InputAdornment>
                     ),
                   }}
-                  value={filter.key_searchs}
-                  onChange={(e) =>
-                    setFilter({ ...filter, key_searchs: e.target.value })
-                  }
-                  variant="standard"
+                  sx={{ mx: 2 }}
                 />
               </Box>
+              {brands.map((brand) => (
+                <Box
+                  key={brand.name}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mx={2}
+                >
+                  <FormControlLabel
+                    control={<Checkbox name={brand.name} />}
+                    label={brand.name}
+                  />
+                  <small className="badge">{brand.count}</small>
+                </Box>
+              ))}
+            </Card>
+          </Box>
+          <Box sx={{ gridArea: "right" }}>
+            {viewType === 1 ? (
+              <Grid container spacing={2}>
+                {currentData.map((d, index) => (
+                  <Grid
+                    item
+                    lg={3}
+                    md={3}
+                    sm={6}
+                    xs={12}
+                    sx={{ mt: 0.5 }}
+                    key={index}
+                  >
+                    <ProductCard
+                      item={d}
+                      key={index}
+                      handleAddToCart={handleAddToCart}
+                    />
+                  </Grid>
+                ))}
+                <Grid container justifyContent="center" sx={{ mt: 4, mb: 2 }}>
+                  <Pagination
+                    count={pageCount}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                  />
+                </Grid>
+              </Grid>
+            ) : (
+              <>
+                {currentData.map((d, index) => {
+                  return (
+                    <Card elevation={4} sx={{ mb: 2 }}>
+                      <Grid container spacing={2} sx={{ my: "auto" }}>
+                        {/* Left Section: Product Image and Add to Cart button */}
+                        <Grid
+                          item
+                          xs={12}
+                          sm={6}
+                          md={6}
+                          lg={6}
+                          padding={2}
+                          // sx={{ display: "flex", justifyContent: "center" }}
+                        >
+                          <Box
+                            sx={{
+                              height: 1,
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <img
+                              src={d.image}
+                              alt={d.name}
+                              style={{ width: "95%", height: "300px" }}
+                            />
+                          </Box>
+                        </Grid>
+
+                        {/* Right Section: Product Info */}
+                        <Grid item xs={12} sm={6}>
+                          <h3>{d.name}</h3>
+                          <Box>
+                            <Box sx={{ textAlign: "left" }}>
+                              <Box
+                                sx={{
+                                  display: "inline-block",
+                                  fontSize: "18px",
+                                }}
+                              >
+                                {usdFormatter.format(d.priceSale)}
+                              </Box>
+                              <Box
+                                sx={{
+                                  display: "inline-block",
+                                  ml: 1,
+                                  textDecoration: "line-through",
+                                  fontSize: "14px",
+                                  color: "#cf0003",
+                                }}
+                              >
+                                {usdFormatter.format(d.price)}
+                              </Box>
+                            </Box>
+                            <Rating
+                              name="read-only"
+                              value={4}
+                              readOnly
+                              size="small"
+                              precision={0.5}
+                            />
+                          </Box>
+                          <p>{d.desc}</p>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={(e) => handleAddToCart(d, e)}
+                            startIcon={<Icon>shopping_cart</Icon>}
+                          >
+                            Add To Cart
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  );
+                })}
+                <Grid container justifyContent="center" sx={{ mt: 4, mb: 2 }}>
+                  <Pagination
+                    count={pageCount}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                  />
+                </Grid>
+              </>
+            )}
+          </Box>
+        </Box>
+        {/* <Grid container spacing={2} style={{ padding: "1rem" }}>
+          <Grid
+            item
+            lg={2}
+            md={2}
+            sm={12}
+            xs={12}
+            style={{ marginTop: "0.5rem" }}
+          >
+            <Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "center", p: 1, m: 1 }}
+              ></Box>
               <Box
                 sx={{ display: "flex", justifyContent: "start", px: 1, mx: 2 }}
               >
@@ -251,38 +528,43 @@ const Product = () => {
               </Box>
             </Box>
           </Grid>
-          <Grid lg={10} md={10} sm={12} xs={12} sx={{ mt: 0.5 }}>
-            <Item>
-              <Container maxWidth="lg">
-                <Grid container spacing={2}>
-                  {currentData.map((d, index) => (
-                    <Grid
-                      item
-                      lg={3}
-                      md={3}
-                      sm={6}
-                      xs={12}
-                      sx={{ mt: 0.5 }}
-                      key={index}
-                    >
-                      <ProductCard item={d} key={index} />
-                    </Grid>
-                  ))}
-                </Grid>
-              </Container>
-              <Grid container justifyContent="center" sx={{ mt: 4 }}>
-                <Pagination
-                  count={pageCount}
-                  page={currentPage}
-                  onChange={handlePageChange}
-                  color="primary"
-                />
+          <Grid
+            item
+            lg={10}
+            md={10}
+            sm={12}
+            xs={12}
+            style={{ marginTop: "0.5rem" }}
+          >
+            <Container maxWidth="lg">
+              <Grid container spacing={2}>
+                {currentData.map((d, index) => (
+                  <Grid
+                    item
+                    lg={3}
+                    md={3}
+                    sm={6}
+                    xs={12}
+                    sx={{ mt: 0.5 }}
+                    key={index}
+                  >
+                    <ProductCard item={d} key={index} />
+                  </Grid>
+                ))}
               </Grid>
-            </Item>
+            </Container>
+            <Grid container justifyContent="center" sx={{ mt: 4 }}>
+              <Pagination
+                count={pageCount}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+              />
+            </Grid>
           </Grid>
-        </Grid>
+        </Grid> */}
       </Box>
-    </div>
+    </Box>
   );
 };
 

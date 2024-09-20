@@ -2,8 +2,9 @@
 import { get, post } from "api/api"
 import { useEffect, useState } from "react"
 import { getAllProvinces, getDistrictsByProvince, getWardsByDistrict } from "../address"
+import { getCartList } from "../cart"
 import { getAllProduct, getDetailProduct } from "../products"
-import { getAllUserApi, getDetailUser } from "../users"
+import { getAllUserApi, getDetailUser, getListMailLog } from "../users"
 
 export const useProductDetail = (_id) => {
     const [data, setData] = useState({})
@@ -102,5 +103,33 @@ export const useListWards = (name) => {
     useEffect(() => {
         if (name) fetchData()
     }, [name])
+    return data
+}
+
+export const useListCart = (userId) => {
+    const [data, setData] = useState([])
+
+    async function fetchData() {
+        const response = await post(getCartList, { userId: userId })
+
+        if (response.status) setData(response.data)
+    }
+    useEffect(() => {
+        if (userId) fetchData()
+    }, [userId])
+    return data
+}
+
+export const useListLogMail = (userId) => {
+    const [data, setData] = useState([])
+
+    async function fetchData() {
+        const response = await post(getListMailLog, { userId: userId })
+
+        if (response.status) setData(response.data)
+    }
+    useEffect(() => {
+        if (userId) fetchData()
+    }, [userId])
     return data
 }

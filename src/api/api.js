@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export const api = axios.create({
     baseURL: 'http://localhost:4000', // Địa chỉ API cơ bản
@@ -12,6 +13,16 @@ export const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
+        const user_id = Cookies.get('user_id');
+        const c = {
+            userId: user_id
+        }
+        config.headers['info'] = JSON.stringify({
+            userId: c.userId,
+            deivce_name: 'win10amddmddm',
+            bundle_id: 'webadminbdc',
+        })
+        // config.data = { ...config.data, userId: user_id };
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

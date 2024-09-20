@@ -10,10 +10,12 @@ import SettingsProvider from "./contexts/SettingsContext";
 import routes from "./routes";
 // FAKE SERVER
 import { Alert, Snackbar } from "@mui/material";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "../fake-db";
-import { hideToast } from "../redux/feature";
+import { addToCart, hideToast } from "../redux/feature";
+import { useListCart } from "./api";
 
 export default function App() {
   const content = useRoutes(routes);
@@ -24,6 +26,30 @@ export default function App() {
   const handleClose = () => {
     setVisible(false);
   };
+  const userId = Cookies.get("user_id");
+  const carts = useListCart(userId);
+  useEffect(() => {
+    if (carts.length > 0) {
+      carts.forEach((cartItem) => {
+        dispatch(
+          addToCart({
+            items: [
+              {
+                productId: cartItem.productId._id,
+                quantity: cartItem.quantity,
+                name: cartItem.productId.name,
+                image: cartItem.productId.image,
+                price: cartItem.priceSale ? cartItem.priceSale : cartItem.price,
+                total_price: cartItem.priceSale
+                  ? cartItem.priceSale
+                  : cartItem.price,
+              },
+            ],
+          })
+        );
+      });
+    }
+  }, [carts, dispatch]);
   // const user = useSelector((state) => state.userInfo);
   // console.log(user);
   useEffect(() => {

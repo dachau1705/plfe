@@ -2,8 +2,9 @@ import { Autocomplete, Button, Chip, Icon, TextField } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { post } from "api/api";
-import { useUserDetail } from "app/api";
+import { useListLogMail, useUserDetail } from "app/api";
 import Cookies from "js-cookie";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +46,7 @@ const Item = (props) => {
   );
 };
 
-const Item2 = (props) => {
+export const Item2 = (props) => {
   const { sx, ...other } = props;
   return (
     <Box
@@ -69,7 +70,7 @@ const Item2 = (props) => {
     />
   );
 };
-const Item3 = (props) => {
+export const Item3 = (props) => {
   const { sx, ...other } = props;
   return (
     <Box
@@ -77,8 +78,9 @@ const Item3 = (props) => {
         (theme) => ({
           color: "grey.800",
           px: 1,
-          py: 1,
+          py: 1.5,
           my: "auto",
+          textAlign: "right",
           fontWeight: "light",
           borderRadius: 2,
           ...theme.applyStyles("dark", {
@@ -134,6 +136,7 @@ const UserDetail = () => {
   const [userInfor, setUserInfor] = useState({});
   const [address, setAddress] = useState({});
   const [optionSend, setOptionSend] = useState("Resend Last Invoice");
+  const mailLog = useListLogMail(_id);
 
   useEffect(() => {
     if (detail.user) {
@@ -544,31 +547,27 @@ const UserDetail = () => {
                 </StyledButton>
               </Box>
             </Box>
-
-            <Box
-              sx={{
-                display: "grid",
-                gap: 1,
-                gridTemplateColumns: "repeat(2, 1fr)",
-                borderBottom: "1px solid",
-                borderColor: "grey.300",
-              }}
-            >
-              <Item2>27/10/2020 | 12:23</Item2>
-              <Item2> Order Received</Item2>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gap: 1,
-                gridTemplateColumns: "repeat(2, 1fr)",
-                borderBottom: "1px solid",
-                borderColor: "grey.300",
-              }}
-            >
-              <Item2>11/05/2020 | 01:19</Item2>
-              <Item2> Order Confirmation</Item2>
-            </Box>
+            {mailLog.map((log, index) => {
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "grid",
+                    gap: 1,
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    borderBottom: index < mailLog.length - 1 ? "1px solid" : "",
+                    borderColor: "grey.300",
+                  }}
+                >
+                  <Item2>
+                    {moment(new Date(log.createdAt)).format(
+                      "DD/MM/YYYY | HH:mm"
+                    )}
+                  </Item2>
+                  <Item2> {log.subject}</Item2>
+                </Box>
+              );
+            })}
           </Item>
           <Item>
             <Box

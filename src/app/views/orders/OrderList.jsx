@@ -6,9 +6,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StyledButton } from "../material-kit/buttons/AppButton";
 import PaginationTable from "../material-kit/tables/PaginationTable";
-import UpdateProduct from "./UpdateProduct";
+import UpdateProduct from "../product/UpdateProduct";
 
-const ProductList = () => {
+const OrderList = () => {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState();
@@ -41,9 +41,9 @@ const ProductList = () => {
             HOME
           </Link>
           <Link underline="hover" to="/product/default">
-            PRODUCT
+            ORDER
           </Link>
-          <Typography color="text.primary">LIST PRODUCT</Typography>
+          <Typography color="text.primary">LIST ORDER</Typography>
         </Breadcrumbs>
       </Box>
       <SimpleCard title="Product List">
@@ -85,4 +85,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default OrderList;

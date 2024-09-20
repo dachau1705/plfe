@@ -1,20 +1,35 @@
-import { Fragment, useState } from "react";
-import { Badge, Button, Drawer, IconButton, ThemeProvider, Box, styled } from "@mui/material";
 import { Clear, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import {
+  Badge,
+  Box,
+  Button,
+  Drawer,
+  IconButton,
+  styled,
+  ThemeProvider,
+} from "@mui/material";
+import { Fragment, useState } from "react";
 
-import { H6, Small } from "./Typography";
 import useSettings from "app/hooks/useSettings";
 import { themeShadows } from "./MatxTheme/themeColors";
+import { H6, Small } from "./Typography";
 
+import { post } from "api/api";
+import { checkout } from "app/api";
 import { sideNavWidth, topBarHeight } from "app/utils/constant";
+import { usdFormatter } from "constants";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { removeFromCart, updateQuantity } from "../../redux/feature";
 
 // STYLED COMPONENTS
 const MiniCart = styled(Box)({
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  width: sideNavWidth
+  width: sideNavWidth,
 });
 
 const CartBox = styled(Box)({
@@ -28,8 +43,8 @@ const CartBox = styled(Box)({
     marginTop: 0,
     marginBottom: 0,
     marginLeft: "16px",
-    fontWeight: "500"
-  }
+    fontWeight: "500",
+  },
 });
 
 const ProductBox = styled(Box)({
@@ -37,7 +52,7 @@ const ProductBox = styled(Box)({
   alignItems: "center",
   padding: "8px 8px",
   transition: "background 300ms ease",
-  "&:hover": { background: "rgba(0,0,0,0.01)" }
+  "&:hover": { background: "rgba(0,0,0,0.01)" },
 });
 
 const IMG = styled("img")({ width: 48 });
@@ -52,56 +67,55 @@ const ProductDetails = styled(Box)({
     textOverflow: "ellipsis",
     display: "block",
     width: 120,
-    marginBottom: "4px"
-  }
+    marginBottom: "4px",
+  },
 });
 
-const data = [
-  {
-    qty: 1,
-    price: 987,
-    title: "Bit Bass Headphone",
-    id: "333sa680bdf4976dfgga21rt4",
-    imgUrl: "/assets/images/products/headphone-2.jpg"
-  },
-  {
-    qty: 1,
-    price: 454,
-    title: "Bass Speaker 1",
-    id: "323sa680b324976dfgga21rt47",
-    imgUrl: "/assets/images/products/speaker-2.jpg"
-  },
-  {
-    qty: 1,
-    price: 134,
-    title: "Bass Speaker 2",
-    id: "323sa680bdf4976dfgga21rt4",
-    imgUrl: "/assets/images/products/headphone-1.jpg"
-  }
-];
-
-export default function ShoppingCart({ container }) {
+const ShoppingCart = ({ container }) => {
   const { settings } = useSettings();
   const [panelOpen, setPanelOpen] = useState(false);
-  const [cartList, setCartList] = useState([...data]);
+  const [cartList, setCartList] = useState([]); 
+  const carts = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (carts) {
+      setCartList(carts.items);
+    }
+  }, [carts]);
 
   const handleDrawerToggle = () => setPanelOpen(!panelOpen);
 
   const handleCheckoutClick = () => setPanelOpen(false);
 
   const handleAddQty = (id) => {
-    setCartList((state) =>
-      state.map((item) => (item.id === id ? { ...item, qty: item.qty + 1 } : item))
-    );
+    dispatch(updateQuantity({ productId: id, type: 1 }));
   };
 
   const handleRemoveQty = (id) => {
-    setCartList((state) =>
-      state.map((item) => (item.id === id ? { ...item, qty: item.qty - 1 } : item))
-    );
+    dispatch(updateQuantity({ productId: id, type: 2 }));
   };
 
-  const totalCost = cartList.reduce((prev, curr) => prev + curr.qty * curr.price, 0);
+  const handleRemove = (id) => {
+    dispatch(removeFromCart({ productId: id }));
+  };
+  const totalCost = cartList.reduce(
+    (prev, curr) => prev + curr.quantity * curr.price,
+    0
+  );
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await post(checkout, { items: cartList });
+      if (result.status) {
+        navigate("/ecommerce/checkout");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gửi dữ liệu:", error);
+    }
+  };
 
   return (
     <Fragment>
@@ -118,41 +132,48 @@ export default function ShoppingCart({ container }) {
           variant="temporary"
           container={container}
           onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}>
+          ModalProps={{ keepMounted: true }}
+        >
           <MiniCart>
             <CartBox>
               <ShoppingCartIcon color="primary" />
               <h5>Cart</h5>
             </CartBox>
-
             <Box flexGrow={1} overflow="auto">
               {cartList.map((product, i) => (
                 <ProductBox key={i}>
                   <Box mr="4px" display="flex" flexDirection="column">
-                    <IconButton size="small" onClick={() => handleAddQty(product.id)}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleAddQty(product.productId)}
+                    >
                       <KeyboardArrowUp />
                     </IconButton>
 
                     <IconButton
-                      onClick={() => handleRemoveQty(product.id)}
-                      disabled={!(product.qty - 1)}
-                      size="small">
+                      onClick={() => handleRemoveQty(product.productId)}
+                      disabled={!(product.quantity - 1)}
+                      size="small"
+                    >
                       <KeyboardArrowDown />
                     </IconButton>
                   </Box>
 
                   <Box mr={1}>
-                    <IMG src={product.imgUrl} alt={product.title} />
+                    <IMG src={product.image} alt={product.name} />
                   </Box>
 
                   <ProductDetails>
-                    <H6>{product.title}</H6>
+                    <H6>{product.name}</H6>
                     <Small color="text.secondary">
-                      ${product.price} x {product.qty}
+                      {usdFormatter.format(product.price)} x {product.quantity}
                     </Small>
                   </ProductDetails>
 
-                  <IconButton size="small">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemove(product.productId)}
+                  >
                     <Clear fontSize="small" />
                   </IconButton>
                 </ProductBox>
@@ -162,13 +183,16 @@ export default function ShoppingCart({ container }) {
             <Button
               color="primary"
               variant="contained"
-              onClick={handleCheckoutClick}
-              sx={{ width: "100%", borderRadius: 0 }}>
-              Checkout (${totalCost.toFixed(2)})
+              onClick={handleSubmit}
+              sx={{ width: "100%", borderRadius: 0 }}
+            >
+              Checkout ({usdFormatter.format(totalCost)})
             </Button>
           </MiniCart>
         </Drawer>
       </ThemeProvider>
     </Fragment>
   );
-}
+};
+
+export default ShoppingCart;

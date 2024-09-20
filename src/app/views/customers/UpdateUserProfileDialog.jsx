@@ -8,7 +8,7 @@ import {
   useListDistrics,
   useListProvinces,
   useListWards,
-  useUserDetail
+  useUserDetail,
 } from "app/api";
 import { createUser, updateUser } from "app/api/users";
 import { FormUpdate } from "core/form/FormUpdate";
@@ -19,7 +19,17 @@ import { removePropObject } from "utils";
 import { role } from "../../../constants";
 
 export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
-  const [infos, setInfos] = useState({});
+  const [infos, setInfos] = useState({
+    email: "",
+    role: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    country: "",
+    postalCode: "",
+    desc: "",
+    dob: "",
+  });
   const detail = useUserDetail(_id);
   const [userDeatail, setUserDetail] = useState({});
   const [file, setFile] = useState(null);
@@ -66,6 +76,8 @@ export default function UpdateUserDialog({ open, setOpen, _id, setParams }) {
       });
       if (userInfo?.avatar) {
         setFile(userInfo?.avatar);
+      } else {
+        setFile(null);
       }
     }
   }, [detail]);
