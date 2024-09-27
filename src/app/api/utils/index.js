@@ -3,6 +3,7 @@ import { get, post } from "api/api"
 import { useEffect, useState } from "react"
 import { getAllProvinces, getDistrictsByProvince, getWardsByDistrict } from "../address"
 import { getCartList } from "../cart"
+import { getListOrder } from "../orders"
 import { getAllProduct, getDetailProduct } from "../products"
 import { getAllUserApi, getDetailUser, getListMailLog } from "../users"
 
@@ -125,6 +126,20 @@ export const useListLogMail = (userId) => {
 
     async function fetchData() {
         const response = await post(getListMailLog, { userId: userId })
+
+        if (response.status) setData(response.data)
+    }
+    useEffect(() => {
+        if (userId) fetchData()
+    }, [userId])
+    return data
+}
+
+export const useListOrder = (userId) => {
+    const [data, setData] = useState([])
+
+    async function fetchData() {
+        const response = await post(getListOrder, { userId: userId })
 
         if (response.status) setData(response.data)
     }

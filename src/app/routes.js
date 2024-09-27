@@ -26,6 +26,8 @@ const CustomerList = Loadable(lazy(() => import("app/views/customers/CustomerLis
 const ViewUser = Loadable(lazy(() => import("app/views/customers/ViewUser")))
 const OrderList = Loadable(lazy(() => import("app/views/orders/OrderList")))
 const Checkout = Loadable(lazy(() => import("app/views/ecommerce/Checkout")))
+const Cart = Loadable(lazy(() => import("app/views/ecommerce/Cart")))
+const Chat = Loadable(lazy(() => import("app/views/chat/Chat")))
 const routes = [
   {
     element: (
@@ -44,6 +46,8 @@ const routes = [
       { path: "/customer/view-customer", element: <ViewUser />, auth: authRoles.admin },
       { path: "/orders/order-list", element: <OrderList />, auth: authRoles.admin },
       { path: "/ecommerce/checkout", element: <Checkout />, auth: authRoles.admin },
+      { path: "/ecommerce/cart", element: <Cart />, auth: authRoles.admin },
+      { path: "/chat/chat", element: <Chat />, auth: authRoles.admin },
       // e-chart route
       { path: "/charts/echarts", element: <AppEchart />, auth: authRoles.editor }
     ]

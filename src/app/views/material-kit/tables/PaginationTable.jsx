@@ -46,9 +46,11 @@ export default function PaginationTable({
         fontWeight: "700",
       }}
     >
-      <Box sx={{ textAlign: "left", fontSize: "h5.fontSize" }}>
-        <Box>{header}</Box>
-      </Box>
+      {header && (
+        <Box sx={{ textAlign: "left", fontSize: "h5.fontSize" }}>
+          <Box>{header}</Box>
+        </Box>
+      )}
       <Table sx={{ width: 1 }}>
         <TableHead>
           <TableRow>

@@ -1,17 +1,17 @@
-import { useEffect, useRef, memo } from "react";
-import { ThemeProvider, useMediaQuery, Box, styled, useTheme } from "@mui/material";
+import { Box, styled, ThemeProvider, useMediaQuery, useTheme } from "@mui/material";
+import { memo, useEffect, useRef } from "react";
 import Scrollbar from "react-perfect-scrollbar";
 import { Outlet } from "react-router-dom";
 
 import useSettings from "app/hooks/useSettings";
 
-import Layout1Topbar from "./Layout1Topbar";
 import Layout1Sidenav from "./Layout1Sidenav";
+import Layout1Topbar from "./Layout1Topbar";
 
-import Footer from "app/components/Footer";
 import { MatxSuspense } from "app/components";
-import { SecondarySidebar } from "app/components/SecondarySidebar";
+import Footer from "app/components/Footer";
 import SidenavTheme from "app/components/MatxTheme/SidenavTheme/SidenavTheme";
+import { SecondarySidebar } from "app/components/SecondarySidebar";
 
 import { sidenavCompactWidth, sideNavWidth } from "app/utils/constant";
 
@@ -135,7 +135,7 @@ const Layout1 = () => {
               </MatxSuspense>
             </Box>
 
-            {settings.footer.show && !settings.footer.fixed && <Footer />}
+            {/* {settings.footer.show && !settings.footer.fixed && <Footer />} */}
           </ContentBox>
         )}
 

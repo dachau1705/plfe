@@ -46,6 +46,7 @@ const Product = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const [render, setRender] = useState(false);
 
   const categories = [
     { name: "Audio", count: 321 },
@@ -69,7 +70,7 @@ const Product = () => {
       setData(data.sort((a, b) => b.priceSale - a.priceSale));
     } else if (value === "highest") {
       setData(data.sort((a, b) => a.priceSale - b.priceSale));
-    }
+    } else setRender((prev) => !prev);
   };
 
   const handleRadioChange = (event) => {
@@ -93,7 +94,7 @@ const Product = () => {
       }
     }
     fetchData();
-  }, []);
+  }, [render]);
 
   useEffect(() => {
     if (viewType === 1) {

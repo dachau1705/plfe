@@ -1,21 +1,34 @@
-import { useCallback, useEffect, useState } from "react";
-import { Avatar, Box, Divider, IconButton, styled, TextField, useTheme } from "@mui/material";
 import { Attachment, Clear, TagFaces } from "@mui/icons-material";
-import ScrollBar from "react-perfect-scrollbar";
-import { H5, H6, Span } from "./Typography";
+import {
+  Avatar,
+  Box,
+  Divider,
+  IconButton,
+  styled,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { ChatAvatar } from "app/components";
 import { convertHexToRGB } from "app/utils/utils";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import ScrollBar from "react-perfect-scrollbar";
+import io from "socket.io-client";
+import { H5, Span } from "./Typography";
+
+// Kết nối tới server socket.io
+const socket = io("http://localhost:4000");
 
 // STYLED COMPONENTS
 const ChatContainer = styled("div")({
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  background: "#fff"
+  background: "#fff",
 });
 
 const StyledScrollBar = styled(ScrollBar)({
-  flexGrow: 1
+  flexGrow: 1,
 });
 
 const ProfileBox = styled("div")(({ theme }) => ({
@@ -24,7 +37,7 @@ const ProfileBox = styled("div")(({ theme }) => ({
   justifyContent: "space-between",
   padding: "12px 12px 12px 20px",
   color: theme.palette.primary.main,
-  background: "#fafafa"
+  background: "#fafafa",
 }));
 
 const ChatStatus = styled("div")(({ theme }) => ({
@@ -33,12 +46,12 @@ const ChatStatus = styled("div")(({ theme }) => ({
   "& h5": {
     marginTop: 0,
     fontSize: "14px",
-    marginBottom: "3px"
+    marginBottom: "3px",
   },
-  "& span": { fontWeight: "500" }
+  "& span": { fontWeight: "500" },
 }));
 
-const ChatMessage = styled("div")(({ theme }) => ({
+const ChatMessage = styled("div")(({ theme, isSender }) => ({
   padding: "8px",
   maxWidth: 240,
   fontSize: "14px",
@@ -47,19 +60,21 @@ const ChatMessage = styled("div")(({ theme }) => ({
   whiteSpace: "pre-wrap",
   wordBreak: "break-word",
   color: theme.palette.primary.main,
-  background: "#fafafa"
+  background: "#fafafa",
+  alignSelf: isSender ? "flex-end" : "flex-start", // Điều chỉnh tin nhắn căn trái/phải
+  backgroundColor: isSender ? "#E0F7FA" : "#F0F4C3", // Màu nền cho tin nhắn gửi đi và nhận về
 }));
 
 const MessageTime = styled("span")(({ theme }) => ({
   fontSize: "13px",
   fontWeight: "500",
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }));
 
 const ChatImgContainer = styled("div")({
   padding: "20px",
   display: "flex",
-  justifyContent: "flex-end"
+  justifyContent: "flex-end",
 });
 
 const ChatImgBox = styled("div")(({ theme }) => ({
@@ -71,159 +86,63 @@ const ChatImgBox = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   color: theme.palette.primary.main,
-  background: "#fafafa"
+  background: "#fafafa",
 }));
 
 const ChatImg = styled("img")(() => ({ width: "40px" }));
 
-// for previewing bot message
-const globalMessageList = [];
-
 export default function Chatbox({ togglePopup }) {
-  const [isAlive, setIsAlive] = useState(true);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  const currentUserId = "7863a6802ez0e277a0f98534";
-  const chatBottomRef = document.querySelector("#chat-scroll");
+  const currentUserId = Cookies.get("user_id");
+
+  useEffect(() => {
+    // Lắng nghe sự kiện 'message' từ server
+    socket.on("message", (messageObject) => {
+      console.log(messageObject);
+
+      setMessageList((prevMessages) => [...prevMessages, messageObject]);
+    });
+
+    // Ngắt kết nối socket khi component unmount
+    return () => {
+      socket.off("message");
+    };
+  }, []);
 
   const sendMessageOnEnter = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       let tempMessage = message.trim();
       if (tempMessage !== "") {
-        let tempList = [...messageList];
         let messageObject = {
           text: tempMessage,
-          contactId: currentUserId
+          contactId: currentUserId,
+          time: new Date(),
+          lasted: true, // Tin nhắn mới nhất
         };
-        tempList.push(messageObject);
-        globalMessageList.push(messageObject);
-        if (isAlive) setMessageList(tempList);
-        dummyReply();
+
+        // Cập nhật tất cả các tin nhắn cũ thành lasted: false
+        const updatedMessages = messageList.map((msg) => ({
+          ...msg,
+          lasted: false,
+        }));
+
+        // Gửi tin nhắn đến server thông qua socket
+        socket.emit("message", messageObject);
+
+        // Cập nhật tin nhắn trên giao diện người dùng với tin nhắn mới nhất là lasted: true
+        setMessageList([...updatedMessages]);
+
+        // Reset lại nội dung tin nhắn trong input
+        setMessage("");
       }
-      setMessage("");
     }
   };
-
-  const dummyReply = async () => {
-    setTimeout(() => {
-      let tempList = [...messageList];
-      let messageObject = {
-        text: "Good to hear from you. enjoy!!!",
-        contactId: "opponents contact id",
-        avatar: "/assets/images/faces/13.jpg",
-        name: "Frank Powell"
-      };
-
-      tempList.push(messageObject);
-      globalMessageList.push(messageObject);
-      if (isAlive) setMessageList(globalMessageList);
-    }, 2000);
-  };
-
-  const scrollToBottom = useCallback(() => {
-    if (chatBottomRef) {
-      chatBottomRef.scrollTo({
-        top: chatBottomRef.scrollHeight,
-        behavior: "smooth"
-      });
-    }
-  }, [chatBottomRef]);
-
-  useEffect(() => {
-    if (isAlive) {
-      setMessageList([
-        {
-          contactId: "323sa680b3249760ea21rt47",
-          text: "Do you ever find yourself falling into the “discount trap?”",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "323sa680b3249760ea21rt47",
-          name: "Frank Powell",
-          avatar: "/assets/images/faces/13.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "7863a6802ez0e277a0f98534",
-          text: "Giving away your knowledge or product just to gain clients?",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "7863a6802ez0e277a0f98534",
-          name: "John Doe",
-          avatar: "/assets/images/face-1.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "323sa680b3249760ea21rt47",
-          text: "Yes",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "323sa680b3249760ea21rt47",
-          name: "Frank Powell",
-          avatar: "/assets/images/faces/13.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "7863a6802ez0e277a0f98534",
-          text: "Don’t feel bad. It happens to a lot of us",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "7863a6802ez0e277a0f98534",
-          name: "John Doe",
-          avatar: "/assets/images/face-1.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "323sa680b3249760ea21rt47",
-          text: "Do you ever find yourself falling into the “discount trap?”",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "323sa680b3249760ea21rt47",
-          name: "Frank Powell",
-          avatar: "/assets/images/faces/13.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "7863a6802ez0e277a0f98534",
-          text: "Giving away your knowledge or product just to gain clients?",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "7863a6802ez0e277a0f98534",
-          name: "John Doe",
-          avatar: "/assets/images/face-1.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "323sa680b3249760ea21rt47",
-          text: "Yes",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "323sa680b3249760ea21rt47",
-          name: "Frank Powell",
-          avatar: "/assets/images/faces/13.jpg",
-          status: "online",
-          mood: ""
-        },
-        {
-          contactId: "7863a6802ez0e277a0f98534",
-          text: "Don’t feel bad. It happens to a lot of us",
-          time: "2018-02-10T08:45:28.291Z",
-          id: "7863a6802ez0e277a0f98534",
-          name: "John Doe",
-          avatar: "/assets/images/face-1.jpg",
-          status: "online",
-          mood: ""
-        }
-      ]);
-    }
-  }, [isAlive]);
-
-  useEffect(() => {
-    scrollToBottom();
-    return () => setIsAlive(false);
-  }, [messageList, scrollToBottom]);
 
   const { palette } = useTheme();
   const primary = palette.primary.main;
   const textPrimary = palette.text.primary;
+  console.log(messageList);
 
   return (
     <ChatContainer>
@@ -245,7 +164,11 @@ export default function Chatbox({ togglePopup }) {
             key={ind}
             p="20px"
             display="flex"
-            sx={{ justifyContent: currentUserId === item.contactId && "flex-end" }}>
+            sx={{
+              justifyContent:
+                currentUserId === item.contactId ? "flex-end" : "flex-start", // Căn tin nhắn gửi đi và nhận về
+            }}
+          >
             {currentUserId !== item.contactId && <Avatar src={item.avatar} />}
             <Box ml="12px">
               {currentUserId !== item.contactId && (
@@ -253,32 +176,21 @@ export default function Chatbox({ togglePopup }) {
                   {item.name}
                 </H5>
               )}
-              <ChatMessage>{item.text}</ChatMessage>
-              <MessageTime>1 minute ago</MessageTime>
+              <ChatMessage
+                isSender={currentUserId === item.contactId ? true : false}
+              >
+                {item.text}
+              </ChatMessage>
+              {item.lasted ? <MessageTime>1 minute ago</MessageTime> : null}
             </Box>
           </Box>
         ))}
-
-        {/* example of image sent by current user*/}
-        <ChatImgContainer>
-          <Box ml="12px">
-            <ChatImgBox>
-              <ChatImg alt="laptop" src="/assets/images/laptop-1.png" />
-
-              <Box ml="12px">
-                <H6 mt={0} mb={0.5}>
-                  Asus K555LA.png
-                </H6>
-                <MessageTime>21.5KB</MessageTime>
-              </Box>
-            </ChatImgBox>
-            <MessageTime>1 minute ago</MessageTime>
-          </Box>
-        </ChatImgContainer>
       </StyledScrollBar>
 
       <div>
-        <Divider sx={{ background: `rgba(${convertHexToRGB(textPrimary)}, 0.15)` }} />
+        <Divider
+          sx={{ background: `rgba(${convertHexToRGB(textPrimary)}, 0.15)` }}
+        />
 
         <TextField
           multiline
@@ -301,7 +213,7 @@ export default function Chatbox({ togglePopup }) {
                 </IconButton>
               </Box>
             ),
-            classes: { root: "pl-5 pr-3 py-3 text-body" }
+            classes: { root: "pl-5 pr-3 py-3 text-body" },
           }}
         />
       </div>

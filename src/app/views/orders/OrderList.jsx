@@ -1,7 +1,17 @@
-import { Box, Breadcrumbs, Icon, IconButton, Typography } from "@mui/material";
-import { deleteProduct, useListProduct } from "app/api";
+import {
+  Box,
+  Breadcrumbs,
+  Chip,
+  Icon,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import { deleteProduct, useListOrder } from "app/api";
 import { SimpleCard } from "app/components";
+import { usdFormatter } from "constants";
 import DeleteDialog from "core/form/DeleteDialog";
+import Cookies from "js-cookie";
+import moment from "moment";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StyledButton } from "../material-kit/buttons/AppButton";
@@ -13,7 +23,8 @@ const OrderList = () => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState();
   const [params, setParams] = useState({ reder: false });
-  const data = useListProduct({ ...params }) || [];
+  const userId = Cookies.get("user_id");
+  const data = useListOrder(userId) || [];
   const handleEdit = (_id) => {
     setOpen(true);
     setSelected(_id);
@@ -26,12 +37,38 @@ const OrderList = () => {
     setSelected(_id);
   };
   const columns2 = [
-    { label: "Name", field: "name", align: "left" },
+    { label: "Order No", field: "_id", align: "left" },
     { label: "Image", field: "image", align: "center", type: "image" },
-    { label: "Price", field: "price", align: "center" },
-    { label: "Purchase Price", field: "priceIn", align: "center" },
-    { label: "Price Sale", field: "priceSale", align: "center" },
-    { label: "Amount", field: "amount", align: "center" },
+    {
+      label: "Status",
+      field: "status",
+      align: "center",
+      body: (row) => {
+        if (row.status === "Pending") {
+          return <Chip label="Pending" color="secondary" />;
+        }
+        if (row.status === "Confirmed") {
+          return <Chip label="Confirmed" color="primary" />;
+        }
+        if (row.status === "Shipped") {
+          return <Chip label="Shipped" color="warning" />;
+        }
+        if (row.status === "Delivered") {
+          return <Chip label="Delivered" color="success" />;
+        }
+        if (row.status === "Canceled") {
+          return <Chip label="Canceled" color="danger" />;
+        }
+      },
+    },
+    { label: "Payment Method", field: "paymentMethod", align: "center" },
+    {
+      label: "Date",
+      field: "date",
+      align: "center",
+      body: (row) => <>{moment(row.date).format("HH:mm || DD-MM-YYYY")}</>,
+    },
+    { label: "Total Price", field: "totalPrice", align: "center", body : (row) => <>{usdFormatter.format(row.totalPrice)}</> },
   ];
   return (
     <Box sx={{ mx: 4 }}>
@@ -46,7 +83,7 @@ const OrderList = () => {
           <Typography color="text.primary">LIST ORDER</Typography>
         </Breadcrumbs>
       </Box>
-      <SimpleCard title="Product List">
+      <SimpleCard title="Order List">
         <UpdateProduct
           open={open}
           setOpen={setOpen}

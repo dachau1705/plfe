@@ -22,6 +22,12 @@ export const navigations = [
   {
     name: "Ecommerce", icon: "shopping_basket", children: [
       { name: "Checkout", path: "/ecommerce/checkout", iconText: "A" },
+      { name: "Cart", path: "/ecommerce/cart", iconText: "A" },
+    ]
+  },
+  {
+    name: "Chat", icon: "message", children: [
+      { name: "Chat", path: "/chat/chat", iconText: "A" },
     ]
   },
   { label: "Components", type: "label" },
