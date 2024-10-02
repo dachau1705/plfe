@@ -41,7 +41,8 @@ const ChatHeader = styled(Box)(({ theme }) => ({
 
 const StyledScrollBar = styled(ScrollBar)({
     flexGrow: 1,
-    overflow: "hidden"
+    // overflowY: "auto", // Ensure chat messages scroll independently
+    height: 0, // Important to ensure the container takes up full available space
 });
 
 const ChatMessage = styled("div")(({ theme, isSender }) => ({

@@ -1,9 +1,5 @@
-import ArchiveIcon from '@mui/icons-material/Archive';
-import EditIcon from '@mui/icons-material/Edit';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { styled } from '@mui/material';
+import { Icon, styled } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -87,22 +83,22 @@ export default function LongMenu() {
                 onClose={handleClose}
             >
                 <MenuItem onClick={handleClose} disableRipple>
-                    <EditIcon />
-                    Edit
+                    <Icon sx={{ mx: 1 }}>add_circle_outline</Icon>
+                    <span> New Messages</span>
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
-                    <FileCopyIcon />
-                    Duplicate
+                    <Icon sx={{ mx: 1 }}>group_add</Icon>
+                    <span> New Groups</span>
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
-                <MenuItem onClick={handleClose} disableRipple>
+                {/* <MenuItem onClick={handleClose} disableRipple>
                     <ArchiveIcon />
                     Archive
                 </MenuItem>
                 <MenuItem onClick={handleClose} disableRipple>
                     <MoreHorizIcon />
                     More
-                </MenuItem>
+                </MenuItem> */}
             </StyledMenu>
         </div>
     );
