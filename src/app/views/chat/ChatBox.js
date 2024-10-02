@@ -1,13 +1,14 @@
-import { Attachment, TagFaces } from "@mui/icons-material";
+import { Attachment, MoreVert, TagFaces } from "@mui/icons-material";
 import {
     Avatar,
     Box,
     IconButton,
     styled,
     TextField,
+    Typography,
     useTheme
 } from "@mui/material";
-import { useUserDetail } from "app/api";
+import { useListMessage, useUserDetail } from "app/api";
 import { H5 } from "app/components/Typography";
 import { convertHexToRGB } from "app/utils/utils";
 import Cookies from "js-cookie";
@@ -16,7 +17,7 @@ import ScrollBar from "react-perfect-scrollbar";
 import io from "socket.io-client";
 
 // Kết nối tới server socket.io
-const socket = io("http://localhost:4000");
+const socket = io(process.env.REACT_APP_API_URL);
 
 // STYLED COMPONENTS
 const ChatContainer = styled("div")({
@@ -26,30 +27,22 @@ const ChatContainer = styled("div")({
     background: "#fff",
 });
 
-const StyledScrollBar = styled(ScrollBar)({
-    flexGrow: 1,
-    overflowY: 'auto', // Cho phép cuộn
-});
-
-const ProfileBox = styled("div")(({ theme }) => ({
+const ChatHeader = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "12px 12px 12px 20px",
-    color: theme.palette.primary.main,
-    background: "#fafafa",
+    padding: "12px 16px",
+    backgroundColor: "#f5f5f5",
+    borderBottom: `1px solid rgba(${convertHexToRGB(theme.palette.text.primary)}, 0.15)`,
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
 }));
 
-const ChatStatus = styled("div")(({ theme }) => ({
-    marginLeft: "12px",
-    color: theme.palette.primary.main,
-    "& h5": {
-        marginTop: 0,
-        fontSize: "14px",
-        marginBottom: "3px",
-    },
-    "& span": { fontWeight: "500" },
-}));
+const StyledScrollBar = styled(ScrollBar)({
+    flexGrow: 1,
+    overflow: "hidden"
+});
 
 const ChatMessage = styled("div")(({ theme, isSender }) => ({
     padding: "8px",
@@ -70,6 +63,7 @@ const MessageTime = styled("span")(({ theme }) => ({
     fontWeight: "500",
     color: theme.palette.primary.main,
 }));
+
 const ChatFooter = styled(Box)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
@@ -77,27 +71,41 @@ const ChatFooter = styled(Box)(({ theme }) => ({
     backgroundColor: "#fafafa",
     borderTop: `1px solid rgba(${convertHexToRGB(theme.palette.text.primary)}, 0.15)`,
     position: "sticky",
-    bottom: 0, // Đảm bảo vị trí cố định dưới cùng
+    bottom: 0, // Ensure the footer stays at the bottom
 }));
 
-const ChatBox = ({ user2_id }) => {
+const ChatBox = ({ user2_id, group }) => {
     const detail = useUserDetail(user2_id);
     const userInfor = detail.userInfo;
+    const user1_id = Cookies.get("user_id");
+    const roomId = group._id;
+    const members = group.members;
+    const userId = Cookies.get('user_id');
+    const targetMember = members.filter(m => m.userId !== userId);
+    const detailMember = useUserDetail(targetMember[0].userId);
+
     const [message, setMessage] = useState("");
     const [messageList, setMessageList] = useState([]);
-    const user1_id = Cookies.get("user_id");
+    const chat = useListMessage(group._id); // Get chat messages for the group
 
-    const roomId = [user1_id, user2_id].sort().join('_');
+    // Update message list when group._id changes
+    useEffect(() => {
+        if (chat) {
+            setMessageList([...chat]);
+        } else {
+            setMessageList([]);
+        }
+    }, [chat, group._id]); // Ensure that message list updates when the group ID or chat changes
 
     useEffect(() => {
-        socket.emit('join_room', { user1_id, user2_id });
+        socket.emit('join_room', { room_id: group._id });
         socket.on("message", (messageObject) => {
             setMessageList((prevMessages) => [...prevMessages, messageObject]);
         });
         return () => {
             socket.off("message");
         };
-    }, [user1_id, user2_id]);
+    }, [group]);
 
     const sendMessageOnEnter = (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
@@ -106,13 +114,13 @@ const ChatBox = ({ user2_id }) => {
             if (tempMessage !== "") {
                 const messageObject = {
                     sender_id: user1_id,
-                    receiver_id: user2_id,
+                    receiver_id: targetMember,
                     text: tempMessage,
                     room_id: roomId,
                     timestamp: new Date(),
                     is_read: false,
                 };
-                socket.emit("message", { roomId, data: messageObject });
+                socket.emit("message", { roomId: group._id, data: messageObject });
                 setMessage("");
             }
         }
@@ -123,6 +131,25 @@ const ChatBox = ({ user2_id }) => {
 
     return (
         <ChatContainer>
+            {/* Chat Header */}
+            <ChatHeader>
+                <Box display="flex" alignItems="center">
+                    <Avatar src={group.type === 'single' ? detailMember?.userInfo?.avatar : group.avatarGroup} />
+                    <Box ml={2}>
+                        <H5 mb={0.5} fontSize={18} color={primary}>
+                            {group.type === 'single' ? detailMember?.userInfo?.firstName + ' ' + detailMember?.userInfo?.lastName : group.groupName}
+                        </H5>
+                        <Typography variant="body2" color="textSecondary">
+                            {userInfor?.status || "Active now"}
+                        </Typography>
+                    </Box>
+                </Box>
+                <IconButton>
+                    <MoreVert />
+                </IconButton>
+            </ChatHeader>
+
+            {/* Chat Messages */}
             <StyledScrollBar id="chat-scroll">
                 {messageList.map((item, ind) => (
                     <Box
@@ -134,7 +161,7 @@ const ChatBox = ({ user2_id }) => {
                                 user1_id === item.sender_id ? "flex-end" : "flex-start",
                         }}
                     >
-                        {user1_id !== item.sender_id && <Avatar src={userInfor.avatar} />}
+                        {user1_id !== item.sender_id && <Avatar src={group.type === 'single' ? detailMember?.userInfo?.avatar : group.avatarGroup} />}
                         <Box ml="12px">
                             {user1_id !== item.sender_id && (
                                 <H5 mb={0.5} fontSize={14} color={primary}>
@@ -150,6 +177,7 @@ const ChatBox = ({ user2_id }) => {
                 ))}
             </StyledScrollBar>
 
+            {/* Chat Footer */}
             <ChatFooter>
                 <TextField
                     multiline

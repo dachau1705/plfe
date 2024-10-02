@@ -1,80 +1,109 @@
 import { Avatar, Box, Divider, Typography } from '@mui/material';
-import { useListUsers } from 'app/api';
+import { useListBoxChat } from 'app/api';
 import { useState } from 'react';
 import ChatBox from './ChatBox';
-import UserList from './UserList';
+import Group from './Group';
+import LongMenu from './MenuChat';
 
 const ChatComponent = () => {
-    const [messages, setMessages] = useState([
-        { id: 1, name: 'John Doe', avatar: '/assets/images/face-1.jpg', message: 'a', time: '3 sec ago' },
-        { id: 2, name: 'Jacqueline Day', avatar: '/assets/images/faces/16.jpg', message: "Hi, I'm Jacqueline Day. Your imaginary friend.", time: '2 sec ago' },
-    ]);
-    const [userId, setUserId] = useState(null)
-    const [newMessage, setNewMessage] = useState('');
-
-    const handleSendMessage = () => {
-        if (newMessage.trim()) {
-            setMessages([
-                ...messages,
-                { id: messages.length + 1, name: 'John Doe', avatar: '/assets/images/face-1.jpg', message: newMessage, time: 'Just now' }
-            ]);
-            setNewMessage('');
-        }
-    };
+    const [userId, setUserId] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [params, setParams] = useState({ reder: false });
+    const [groupInfo, setGroupInfo] = useState({});
+    // const data = useListUsers({ ...params }) || [];
+    const lisGroup = useListBoxChat({ ...params }) || [];
 
-    const data = useListUsers({ ...params }) || [];
-
-    const onClick = (user_id) => {
-        setUserId(user_id)
-    }
+    const onClick = (group) => {
+        setSelectedGroup(group);
+    };
 
     return (
-        <Box
-            sx={{
-                width: '100%',
-                height: '140px',
-                color: '#fff',
-                '& > .MuiBox-root > .MuiBox-root': {
-                    p: 1,
-                    borderRadius: 2,
-                    fontSize: '0.875rem',
-                    fontWeight: '700',
-                },
-            }}
-        >
+        <Box>
             <Box
                 sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: 1,
-                    gridTemplateRows: 'auto',
-                    gridTemplateAreas: `"sidebar main main main main main main"`,
-                    m: 2
+                    width: '100%',
+                    color: '#fff',
+                    '& > .MuiBox-root > .MuiBox-root': {
+                        p: 1,
+                        borderRadius: 2,
+                        fontSize: '0.875rem',
+                        fontWeight: '700',
+                    },
                 }}
             >
-                <Box sx={{ gridArea: 'sidebar', bgcolor: 'whitesmoke' }}>
-                    <Box width="230px">
-                        {/* Current User */}
-                        <Box display="flex" alignItems="center" p={2}>
-                            <Avatar src="/assets/images/face-1.jpg" />
-                            <Typography sx={{ color: "black" }} variant="h5" ml={2}>
-                                John Doe
-                            </Typography>
-                        </Box>
-
-                        <Divider />
-
-                        {/* Scrollable User List */}
-                        <Box sx={{ overflowY: 'auto', p: 2 }}>
-                            {data.map((user, index) => (
-                                <UserList _id={user._id} index={index} onClick={e => onClick(user._id)} userId={userId} />
-                            ))}
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 3fr',  // Sidebar takes 1/4th and ChatBox takes 3/4th
+                        gap: 1,
+                        gridTemplateRows: 'auto',
+                        gridTemplateAreas: `"sidebar main"`,  // Sidebar and ChatBox in a single row
+                        m: 2,
+                    }}
+                >
+                    {/* Sidebar */}
+                    <Box sx={{ gridArea: 'sidebar', bgcolor: 'whitesmoke' }}>
+                        <Box
+                            sx={{
+                                height: "100%", // Ensure the container takes up the full height of the viewport
+                                display: "flex",
+                                flexDirection: "column",
+                                background: "#fff",
+                            }}
+                        >
+                            {/* Fixed Header */}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    p: 2,
+                                    bgcolor: 'whitesmoke',
+                                    position: 'sticky',
+                                    top: 0,
+                                    zIndex: 1,
+                                }}
+                            >
+                                <Avatar src="/assets/images/face-1.jpg" />
+                                <Typography sx={{ color: "black" }} variant="h5" ml={2}>
+                                    John Doe
+                                </Typography>
+                                <Box sx={{ flexGrow: 1 }} />
+                                <LongMenu sx={{ mx: 2 }} />
+                            </Box>
+                            <Divider />
+                            <Box sx={{
+                                height: "100%",
+                                flexDirection: "column",
+                                background: "#fff",
+                                padding: "16px",  // Add some padding for better spacing of messages
+                            }}>
+                                <Box
+                                    sx={{
+                                        p: 2,
+                                    }}
+                                >
+                                    {
+                                        lisGroup.map((group, index) => (
+                                            group.type === 'single' ? (
+                                                <Group
+                                                    key={group._id}
+                                                    group={group}
+                                                    index={index}
+                                                    onClick={() => onClick(group)}
+                                                    selectedGroup={selectedGroup}
+                                                />
+                                            ) : null
+                                        ))
+                                    }
+                                </Box>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
-                <Box sx={{ gridArea: 'main', bgcolor: 'whitesmoke' }}>
-                    <ChatBox user2_id={userId} />
+
+                    {/* ChatBox */}
+                    <Box sx={{ gridArea: 'main', bgcolor: 'whitesmoke', height: '100%' }}>
+                        {selectedGroup && <ChatBox user2_id={userId} group={selectedGroup} />}
+                    </Box>
                 </Box>
             </Box>
         </Box>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 export const api = axios.create({
-    baseURL: 'http://localhost:4000', // Địa chỉ API cơ bản
+    baseURL: process.env.REACT_APP_API_URL, // Địa chỉ API cơ bản
     timeout: 1000000, // Thời gian chờ mặc định là 10 giây
     headers: {
         'Content-Type': 'application/json',
